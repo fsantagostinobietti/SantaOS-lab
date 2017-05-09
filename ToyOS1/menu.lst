@@ -1,0 +1,30 @@
+#
+# Sample boot menu configuration file
+#
+
+# Boot automatically after 30 secs.
+timeout 30
+
+# By default, boot the first entry.
+default 0
+
+# Fallback to the second entry.
+fallback 1
+
+# MyToy OS (multiboot)
+title MyToyOS (multiboot)
+root (fd0)
+kernel /kernel32.bin
+
+# Myultiboot Test
+title Myultiboot Test
+root (fd0)
+kernel /mkernel.bin -type=multiboot
+
+# MyToyOS (bootchain)
+title MyToyOS (bootchain)
+chainloader /loader.bin
+
+# Change the colors.
+title Change the colors
+color light-green/brown blink-red/blue
