@@ -6,11 +6,6 @@ http://wiki.osdev.org/Bare_Bones
 
 + Added raw I/O from serial line COM1.
 
-Ref.
-
-      http://wiki.osdev.org/Serial_Ports
-      
-      https://en.wikibooks.org/wiki/Serial_Programming/8250_UART_Programming
 
 
 
@@ -50,3 +45,9 @@ $ sudo sendip 10.0.0.2 -p ipv4 -p tcp -td 8880 -tff 1
 Receive TCP/IP packets
 -----------------------
 Use TUN device ...
+
+
+Ref.
+----
+- http://wiki.osdev.org/Serial_Ports
+- https://en.wikibooks.org/wiki/Serial_Programming/8250_UART_Programming
