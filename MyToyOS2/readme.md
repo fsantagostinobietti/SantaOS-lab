@@ -47,8 +47,9 @@ $ ./createTUN.sh
 ```
     
 2) start execution of 'mytoyos.iso' in vbox.
-
-TODO explain how to start a vbox machine that maps serial port to a unix domain socket under linux.
+```
+$ ./runMyToyOS.sh
+```
     
 3) execute proxy application that sends tcp/ip packets in the unix domain socket, and vice-versa.
 ```
