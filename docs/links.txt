@@ -1,0 +1,171 @@
+Hobbyist operating system development
+-------------------------------------
+https://en.wikipedia.org/wiki/Hobbyist_operating_system_development
+
+
+Information about the creation of operating systems
+---------------------------------------------------
+http://wiki.osdev.org/Main_Page
+
+
+The little book about OS development
+------------------------------------
+https://littleosbook.github.io/
+
+
+Writing a Simple Operating System — from Scratch
+------------------------------------------------
+https://www.cs.bham.ac.uk/~exr/lectures/opsys/10_11/lectures/os-dev.pdf
+
+
+6.828 course: Operating System Engineering
+------------------------------------------
+https://pdos.csail.mit.edu/6.828/2016/xv6.html
+(sources https://github.com/mit-pdos/xv6-public )
+Labs.
+ Lab 1: Booting a PC
+ Lab 2: Memory Management
+ Lab 3: User Environments
+ Lab 4: Preemptive Multitasking
+ Lab 5: File system, Spawn and Shell
+ Lab 6: Network Driver
+ Lab 7: Final JOS project
+(see https://github.com/foreverbell/JOS)
+
+Operating System Development Series
+-----------------------------------
+http://www.brokenthorn.com/Resources/OSDevIndex.html
+
+
+Writing Your Own Toy Operating System: Guides & Tutorials
+---------------------------------------------------------
+http://www.independent-software.com/writing-your-own-toy-operating-system/
+
+
+
+YASS - An educational simulator
+-------------------------------
+http://www.teach-sim.com/
+
+
+Academic, personal, and small non-commercial operating system
+-------------------------------------------------------------
+http://wiki.osdev.org/Projects
+
+List of toyOS github projects
+-----------------------------
+https://github.com/search?utf8=%E2%9C%93&q=toyos&type=
+
+
+Writing an OS in Rust
+---------------------
+http://os.phil-opp.com/
+
+
+Virtual Computer for Operating System Development
+-------------------------------------------------
+http://www.ittybittycomputers.com/IttyBitty/IBSM.htm
+
+
+An educational operating system
+-------------------------------
+http://www.flingos.co.uk/
+
+----------------------------
+TCP/IP stack implementations
+----------------------------
+
+proof-of-concept implementation of the TCP/IP protocol stack
+------------------------------------------------------------
+http://dunkels.com/adam/miniweb/
+
+Intel 82540EM chip driver (aka E1000)
+-------------------------------------
+https://pdos.csail.mit.edu/6.828/2016/labs/lab6/
+
+Let's code a TCP/IP stack
+-------------------------
+http://www.saminiir.com/lets-code-tcp-ip-stack-1-ethernet-arp/
+https://www.kernel.org/doc/Documentation/networking/tuntap.txt
+
+
+uIP
+---
+https://en.wikipedia.org/wiki/UIP_(micro_IP)
+https://github.com/adamdunkels/uip
+
+lwIP - A Lightweight TCP/IP stack
+---------------------------------
+http://savannah.nongnu.org/projects/lwip/
+
+lwIP - Porting For Bare Metal
+-----------------------------
+http://lwip.wikia.com/wiki/Porting_For_Bare_Metal
+http://lwip.wikia.com/wiki/Writing_a_device_driver
+
+lwIP Generic link-layer drivers for any Ethernet chip
+-----------------------------------------------------
+http://scaprile.ldir.com.ar/cms/category/os/link-level/
+(good starting point. need to write low_level_ functions to interact with ethernet-chip)
+
+lwIP - example (Small TCP/IP stacks for micro controllers)
+----------------------------------------------------------
+https://www.utwente.nl/ewi/dacs/assignments/completed/bachelor/reports/B-assignment_vanderPloeg.pdf
+
+open-source mini HTTP daemon - small and elegent
+------------------------------------------------
+http://miniweb.sourceforge.net/
+
+PicoTCP is a free TCP/IP stack implementation 
+---------------------------------------------
+http://www.picotcp.com/
+https://github.com/tass-belgium/picotcp/
+
+
+CycloneTCP is a IPv4/IPv6 stack
+-------------------------------
+http://www.oryx-embedded.com/cyclone_tcp.html
+
+TCP/IP Ethernet stack for embedded microcontrollers 
+---------------------------------------------------
+http://www.embedded-code.com/source-code/communications/ethernet-tcp-ip/ethernet-tcpip-driver
+
+
+How expose TUN interface
+------------------------
+https://wiki.linuxfoundation.org/networking/bridge
+
+
+----------------------------
+Ethernet TCP/IP Driver
+----------------------------
+
+Ethernet TCP/IP Driver
+----------------------
+http://www.embedded-code.com/source-code/communications/ethernet-tcp-ip/ethernet-tcpip-driver
+
+Writing a Network device driver
+-------------------------------
+http://www.tldp.org/LDP/LG/issue93/bhaskaran.html
+
+
+
+----------------------------
+libk (kernel std lib) & libc 
+----------------------------
+
+newlib porting
+--------------
+https://www.sourceware.org/newlib/faq.html#q6
+http://wiki.osdev.org/Porting_Newlib
+
+freestanding libc
+-----------------
+https://github.com/mirage/ocaml-freestanding
+
+protected-mode vga
+------------------
+http://wiki.osdev.org/Printing_To_Screen
+http://www.flingos.co.uk/docs/reference/VGA-Text-Mode/
+
+
