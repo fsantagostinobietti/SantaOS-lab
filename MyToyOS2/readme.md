@@ -14,11 +14,11 @@ Dev architecture
 ----------------
 
 ```
-  eth                    ip               tcp                tcp                                          tcp   +-----------+
- frames   +---------+   pkts  +-------+   pkts   +-------+   pkts   .-------------------.      +------+   pkts  |  miniweb  |
-<-------> | eth0/lo | <-----> | Linux | <------> | socat | <-----> () unix domain socket ) <-> | vbox | <-----> |    on     |
-          +---------+         +-------+          +-------+          '-------------------'      +------+   uart  | SantaNoOS |
-                                                                                                                +-----------+
+  eth                  tcp/ip                 tcp/ip                                      tcp/ip  +-----------+
+ frames   +---------+   pkts  +------------+   pkts   .-------------------.      +------+   pkts  |  miniweb  |
+<-------> | TUN dev | <-----> | tun2serial | <-----> () unix domain socket ) <-> | vbox | <-----> |    on     |
+          +---------+         +------------+          '-------------------'      +------+   uart  | SantaNoOS |
+                                                                                                  +-----------+
 
 eth header + ip header + tcp header + payload
                          '------------------'
@@ -28,6 +28,42 @@ eth header + ip header + tcp header + payload
 '-------------------------------------------'
                   eth frame
 ```
+
+How to build executable image
+-----------------------------
+```
+$ ./compile.sh
+```
+
+'mytoyos.iso' image is produced.
+It can be run in a VM like QEMU, VMware or Virtual Box.
+In this example I use Virtual Box because serial port (uart) can be mapped with a unix domain socket in the host system.
+
+How to execute and test miniweb application
+-------------------------------------------
+1) cretate TUN interface (must be done only once after every reboot)
+```
+$ ./createTUN.sh
+```
+    
+2) start execution of 'mytoyos.iso' in vbox.
+
+TODO explain how to start a vbox machine that maps serial port to a unix domain socket under linux.
+    
+3) execute proxy application that sends tcp/ip packets in the unix domain socket, and vice-versa.
+```
+$ ./eth2serial.sh
+```
+
+4) finally test web application with a simple GET request
+```
+$ curl --noproxy 10.0.0.2  10.0.0.2:8880
+```
+It should output something like this:
+```
+<html><body><p>Hello World!</p></body></html>
+```   
+
 
 ---------
 Utilities

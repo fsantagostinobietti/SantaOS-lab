@@ -1,1 +1,1 @@
-python workspace/miniweb/eth2serial.py
+python eth2serial.py
