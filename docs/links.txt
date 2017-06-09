@@ -41,7 +41,9 @@ Writing Your Own Toy Operating System: Guides & Tutorials
 ---------------------------------------------------------
 http://www.independent-software.com/writing-your-own-toy-operating-system/
 
-
+How to Make a Computer Operating System in C++
+---------------------------------------------- 
+https://github.com/SamyPesse/How-to-Make-a-Computer-Operating-System
 
 YASS - An educational simulator
 -------------------------------
@@ -71,9 +73,20 @@ An educational operating system
 -------------------------------
 http://www.flingos.co.uk/
 
-----------------------------
-TCP/IP stack implementations
-----------------------------
+
+    --------------------------------------
+      Memory allocator (malloc, free, ...)
+    --------------------------------------
+
+Write a simple memory allocator
+-------------------------------
+http://arjunsreedharan.org/post/148675821737/write-a-simple-memory-allocator
+
+
+
+    --------------------------------
+      TCP/IP stack implementations
+    --------------------------------
 
 proof-of-concept implementation of the TCP/IP protocol stack
 ------------------------------------------------------------
@@ -136,9 +149,9 @@ How expose TUN interface
 https://wiki.linuxfoundation.org/networking/bridge
 
 
-----------------------------
-Ethernet TCP/IP Driver
-----------------------------
+    ----------------------------
+      Ethernet TCP/IP Driver
+    ----------------------------
 
 Ethernet TCP/IP Driver
 ----------------------
@@ -148,6 +161,12 @@ Writing a Network device driver
 -------------------------------
 http://www.tldp.org/LDP/LG/issue93/bhaskaran.html
 
+
+   ----------------------------
+     virtio (virtio-net, ...)
+   ----------------------------
+   
+http://wiki.osdev.org/Virtio
 
 
 ----------------------------
