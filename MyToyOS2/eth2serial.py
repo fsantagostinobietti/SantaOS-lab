@@ -42,12 +42,32 @@ import socket
 import sys
 import threading
 import signal
+import struct
 
 # constants
 SRV_SOCKET = './serial_io'
 TUN_DEVICE = 'mytun'
 
-signal
+def u2B( num, nbytes ):
+    ''' convert unsigned to byte string '''
+    if nbytes==1:
+        return struct.pack("!B", num)
+    if nbytes==2:
+        return struct.pack("!H", num) # 2 bytes, big-endian
+    if nbytes==4:
+        return struct.pack("!I", num) # 4 bytes, big-endian
+
+
+def B2u( bb ):
+    ''' convert byte string to unsigned  '''
+    if len(bb)==1:
+        return struct.unpack("!B", bb)[0]    # 1 byte
+    if len(bb)==2:
+        return struct.unpack("!H", bb)[0]    # 2 bytes, big-endian
+    if len(bb)==4:
+        return struct.unpack("!I", bb)[0]    # 4 bytes, big-endian
+    raise NotImplementedError
+        
 def connectToSocket():
     # Create a UDS socket
     sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
@@ -85,7 +105,11 @@ class tun2socket (threading.Thread):
         print '? tun->socket thread active'
         while True:
             pkt = self.tun.read(self.tun.mtu)
-            self.sock.sendall(pkt)
+            # prepare a prolog (magic number + packet size) used by receiver to
+            # detect the end of packet
+            prolog = b'\x0F\xAB\x10' + u2B(len(pkt),2)
+            # send prolog + packet
+            self.sock.sendall(prolog + pkt)
 
 class socket2tun (threading.Thread):
     def __init__(self, sock, tun):
@@ -94,9 +118,19 @@ class socket2tun (threading.Thread):
         self.sock = sock
     def run(self):
         print '? socket->tun thread active'
+        pkt = ''
         while True:
-            pkt = self.sock.recv(2048)
-            self.tun.write(pkt)
+            pkt += self.sock.recv(2048)
+            if len(pkt)>=5:
+                # skip magic number
+                size = B2u( pkt[3:5] )
+                pkt = pkt[5:]   # strip prolog
+                while len(pkt)<size:
+                    pkt += self.sock.recv(2048)
+                self.tun.write(pkt[:size])  # send packet
+                pkt = pkt[size:]    # remove packet sent
+                
+                
 
 
 

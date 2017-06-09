@@ -1,10 +1,6 @@
 /* Surely you will remove the processor conditionals and this comment
    appropriately depending on whether or not you use C++. */
-#if !defined(__cplusplus)
-#include <stdbool.h> /* C doesn't have booleans by default. */
-#endif
-#include <stddef.h>
-#include <stdint.h>
+
  
 /* Check if the compiler thinks we are targeting the wrong operating system. 
 #if defined(__linux__)
@@ -18,43 +14,61 @@
 #endif
  
  
-#include "asm.c"
-#include "std.c" // useful std functions
-#include "vga.c"
-#include "serial.c"
-
+//#include "std.h" // useful std functions
+#include "tty.h"
+#include "stdio.h"
+#include "serial.h"
+#include "tcpip.h"
 
 
 #if defined(__cplusplus)
 extern "C" /* Use C linkage for kernel_main. */
 #endif
+
+static uint8_t dataPkt[2048];
+static int dataPktSz;
+
 void kernel_main(void) {
 	/* Initialize terminal interface */
 	terminal_initialize();
  
 	/* Newline support is left as an exercise. */
-	terminal_writestring("Hello, kernel World!\n");
+	info("Hello, Unikernel World!\n");
 	
-	terminal_writestring("UART model ");
-	terminal_write_uart_model( detect_uart_model() );
-	terminal_writestring(" \n");
+	info("UART model %s\n", detect_uart_model());
 	
 	if ( is_serial_connected() )
-	    terminal_writestring("Serial looks connected!\n");
+	    info("Serial looks connected!\n");
 	
 	
-	char cc[4];
-	while (true) {
-	    readserial4bytes(cc);
-	    
-	    // echo to screen
-	    terminal_writehex(cc[0]); terminal_writehex(cc[1]); terminal_writehex(cc[2]); terminal_writehex(cc[3]);
-	    terminal_writestring("   ["); 
-	    terminal_write(cc, strlen(cc));
-	    terminal_writestring("]\n");
-	    
-	    // echo to serial line
-	    //write_serial( c );
+	IP ipPkg;
+    TCP tcpPkg;
+    while (true) {
+        threeWayHandshake();
+        
+        // receive HTTP GET request
+        nextTcpIpPacket(&ipPkg, &tcpPkg);
+        //debug("HTTP request:\n%s\n", tcpPkg.payload);
+        
+        // send HTML page
+        info("html response\n");
+        uint8_t data[] =    "HTTP/1.0 200 OK\n"
+                            "Content-Type: text/html\n"
+                            "Content-Length: 51\n"
+                            "\n"
+                            "<html><body><p>Hi from SantaNoOS !</p><body></html>";
+        buildRawTcpIpPacket( &ipPkg, &tcpPkg,                           // inputs
+                             FLAG_ACK, data, sizeof(data),              // 
+                             dataPkt, &dataPktSz          // output
+                           );
+        sendRawPacket(dataPkt, dataPktSz);
+        
+        // wait for ACK
+        nextTcpIpPacket(&ipPkg, &tcpPkg);
+            
+        // closing with client
+        fourWayClose(&ipPkg, &tcpPkg);
 	}
+	
 }
 

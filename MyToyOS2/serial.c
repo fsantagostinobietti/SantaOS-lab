@@ -1,14 +1,14 @@
 /* 
    serial I/O 
 */
+
+#include "serial.h"
+#include "asm.h"
+#include "tty.h"
+
 #define PORT 0x3F8   /* COM1 */
 
-enum uart_model {
-    UART_16750  = 0,
-    UART_16550A = 1,
-    UART_16450  = 2,
-    UART_8250   = 3
-};
+
 
 void terminal_write_uart_model(enum uart_model model) {
     switch(model) {

@@ -1,0 +1,213 @@
+/*
+    How to unit test this module:
+    $ gcc -std=gnu99 -Wno-format-security -Wno-implicit-function-declaration -x c tcpip.c.ut  && ./a.out
+*/
+
+int _printf(const char* restrict format, ...) {
+    // nope
+    return -1;
+}
+
+//
+// actual module to test
+//
+#include "tcpip.c"
+#undef printf
+
+#include <stdio.h>
+
+void terminal_writestring(const char* ss) {
+    printf(ss);
+}
+
+
+// mock read_serial() function
+
+static char *rawStream;
+static int rawStreamIdx;
+char read_serial() {
+    return rawStream[rawStreamIdx++];
+}
+
+void write_serial(char c) {
+    // nope
+}
+void* memcpy(void *d, const void *s, size_t n);
+
+
+
+
+void dumpIpPacket(const IP *ip) {
+    printf("IP:\n");
+    printf("\tver         %d\n", ip->ver);
+    printf("\tihl         %d\n", ip->ihl);
+    printf("\tlen         %d\n", ip->len);
+    printf("\tid          0x%04X\n", ip->id);
+    printf("\tflags       %d\n", ip->flags);
+    printf("\tttl         %d\n", ip->ttl);
+    printf("\tprotocol    %d\n", ip->protocol);
+    printf("\tchecksum    0x%04X\n", ip->checksum);
+    printf("\tsrcAddr     %d.%d.%d.%d\n", ip->srcAddr>>24&0xFF, ip->srcAddr>>16&0xFF, ip->srcAddr>>8&0xFF, ip->srcAddr&0xFF );
+    printf("\tdstAddr     %d.%d.%d.%d\n", ip->dstAddr>>24&0xFF, ip->dstAddr>>16&0xFF, ip->dstAddr>>8&0xFF, ip->dstAddr&0xFF );
+    printf("\tpayload sz  %d\n", ip->payloadSz);
+}
+
+void dumpTcpPacket(const TCP *tcp) {
+    printf("TCP:\n");
+    printf("\tsrcPort      %d\n", tcp->srcPort);
+    printf("\tdstPort      %d\n", tcp->dstPort);
+    printf("\tseq          0x%08X\n", tcp->seq);
+    printf("\tack          0x%08X\n", tcp->ack);
+    printf("\toffset       %d\n", tcp->offset);
+    printf("\tflags        0x%02X\n", tcp->flags);
+    printf("\twinSz        %d\n", tcp->winSz);
+    printf("\tchksum       0x%04X\n", tcp->chksum);
+    printf("\turgPtr       0x%04X\n", tcp->urgPtr);
+    printf("\tpayload sz   %d\n", tcp->payloadSz);
+}
+
+int main(void) {
+    //  util methods
+    uint8_t net_data2[] = {0xf1, 0xf2};
+    uint16_t native16 = toNative16(net_data2);
+    printf("%s - toNative16()\n", (native16==0xf1f2) ?"OK" :"FAIL");
+    
+    uint8_t net_data2_tmp[2];
+    toNetwork16(native16, net_data2_tmp);
+    printf("%s - toNetwork16()\n", (( bcmp(net_data2, net_data2_tmp, 2) == 0 )) ?"OK" :"FAIL");
+    
+    uint8_t net_data4[] = {0xf1, 0xf2, 0xf3, 0xf4};
+    uint32_t native32 = toNative32(net_data4);
+    printf("%s - toNative32()\n", (native32==0xf1f2f3f4) ?"OK" :"FAIL");
+    
+    uint8_t net_data4_tmp[4];
+    toNetwork32(native32, net_data4_tmp);
+    printf("%s - toNetwork32()\n", (( bcmp(net_data4, net_data4_tmp, 4) == 0 )) ?"OK" :"FAIL");
+        
+    uint8_t data[] = {0x45,0x00,0x00,0x3c,0x1c,0x46,0x40,0x00,0x40,0x06,
+                      0x00,0x00,0xac,0x10,0x0a,0x63,0xac,0x10,0x0a,0x0c};
+    uint16_t chksum = checksumIp(data, sizeof(data));
+    printf("%s - checksumIp()\n", (chksum==0xB1E6) ?"OK" :"FAIL");
+    
+    IP ipPkg;
+    TCP tcpPkg;
+    uint8_t ip_data[] = {   0x45, 0x00, 0x00, 0x28, 
+                            0x01, 0x00, 0x40, 0x00, 
+                            0x40, 0x06, 0x25, 0xce,
+                            0x0a, 0x00, 0x00, 0x02,
+                            0x0a, 0x00, 0x00, 0x01,
+                            0x22, 0xb0, 0xe5, 0x23,
+                            0x00, 0x00, 0x00, 0x00,
+                            0xca, 0xf5, 0x8a, 0x01,
+                            0x50, 0x12, 0x72, 0x10,
+                            0xcc, 0xf4, 0x00, 0x00   };
+    if ( parseRawIpPacket(&ipPkg, ip_data, sizeof(ip_data)) ) {
+        printf("OK - parseRawIpPacket()\n");
+        //dumpIpPacket(&ipPkg);
+        
+        uint8_t rawtmp[1024];
+        int sztmp;
+    
+        //
+        // buildRawIp() unit test
+        //
+        buildRawIp(&ipPkg, rawtmp, &sztmp);
+        if ( bcmp(ip_data, rawtmp, sizeof(ip_data)) == 0 )
+            printf("OK - buildRawIp()\n");
+        else
+            printf("FAIL - buildRawIp()\n");
+        
+        if ( validateTcpPacket(&ipPkg, ipPkg.payload, ipPkg.payloadSz) ) {
+            printf("OK - parseRawTcpPacket()\n");
+            parseRawTcpPacket(&tcpPkg, ipPkg.payload, ipPkg.payloadSz);
+            //dumpTcpPacket(&tcpPkg);
+            
+            //
+            // buildRawTcp() unit test
+            //
+            buildRawTcp(&tcpPkg, rawtmp, &sztmp);
+            if ( bcmp(ipPkg.payload, rawtmp, ipPkg.payloadSz) == 0 )
+                printf("OK - buildRawTcp()\n");
+            else
+                printf("FAIL - buildRawTcp()\n");
+        } else
+            printf("FAIL - parseRawTcpPacket()\n");
+
+    } else
+        printf("FAIL - parseRawIpPacket()\n");
+        
+    //
+    // readRawPacket() unit test
+    //
+    char stream1[] = {      0xaa, 0xaa,     // some dummy bytes
+                            0x0F, 0xAB, 0x10, // magic number
+                            0x00, 0x04,       // len
+                            0x11, 0x22, 0x33, 0x44  // payload
+                            };
+    rawStream = stream1;
+    rawStreamIdx = 0;
+    uint8_t *buf;
+    int bufSz;
+    readRawPacket(&buf, &bufSz);
+    if ( bufSz==4 ) {
+        char expected[] = {0x11, 0x22, 0x33, 0x44};
+        printf("%s - readRawPacket()\n", (( bcmp(buf, expected, bufSz) == 0 )) ?"OK" :"FAIL");
+    } else
+        printf("FAIL - readRawPacket()\n");
+        
+    //
+    // nextTcpIpPacket() unit test
+    //
+    char stream2[] = {      0x0F, 0xAB, 0x10, // magic number
+                            0x00, 0x28,       // len
+                            0x45, 0x00, 0x00, 0x28, // tcp/ip payload
+                            0x01, 0x00, 0x40, 0x00, 
+                            0x40, 0x06, 0x25, 0xce,
+                            0x0a, 0x00, 0x00, 0x02,
+                            0x0a, 0x00, 0x00, 0x01,
+                            0x22, 0xb0, 0xe5, 0x23,
+                            0x00, 0x00, 0x00, 0x00,
+                            0xca, 0xf5, 0x8a, 0x01,
+                            0x50, 0x12, 0x72, 0x10,
+                            0xcc, 0xf4, 0x00, 0x00
+                            };
+    rawStream = stream2;
+    rawStreamIdx = 0;
+    nextTcpIpPacket(&ipPkg, &tcpPkg);
+    printf("%s - nextTcpIpPacket()\n", (ipPkg.ver==IPv4 && ipPkg.protocol==PROTOCOL_TCP) ?"OK" :"FAIL"); 
+
+    //
+    // buildRawTcpIpPacket() unit test
+    //
+    IP lstIp;
+    lstIp.srcAddr = 0x7F000001; // 127.0.0.1
+    lstIp.dstAddr = 0x7F000001; // 127.0.0.1
+    TCP lstTcp;
+    lstTcp.srcPort   = 10000;
+    lstTcp.dstPort   = 8080;
+    lstTcp.seq       = 1;
+    lstTcp.ack       = 0;
+    lstTcp.payloadSz = 50;
+    uint8_t payload[] = {0x11, 0x22, 0x33};
+    
+    uint8_t raw[1024];
+    int rawSz;
+    buildRawTcpIpPacket( &lstIp, &lstTcp,
+                           FLAG_ACK, payload, sizeof(payload),
+                           raw, &rawSz  );
+    uint8_t rawOK[] = { 0x45, 0x00, 0x00, 0x2B, 
+                        0x01, 0x00, 0x40, 0x00, 
+                        0x40, 0x06, 0x3B, 0xCB, 
+                        0x7F, 0x00, 0x00, 0x01, 
+                        0x7F, 0x00, 0x00, 0x01, 
+                        0x27, 0x10, 0x1F, 0x90, 
+                        0x00, 0x00, 0x00, 0x00, 
+                        0x00, 0x00, 0x00, 0x33, 
+                        0x50, 0x10, 0x72, 0x10, 
+                        0xB4, 0xC9, 0x00, 0x00, 
+                        0x11, 0x22, 0x33 
+                        };
+    printf("%s - buildRawTcpIpPacket()\n", (( bcmp(raw, rawOK, rawSz) == 0 )) ?"OK" :"FAIL");
+
+}
+

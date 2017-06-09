@@ -1,0 +1,51 @@
+/*
+    How to unit test this module:
+    $ gcc -std=gnu99 -Wno-format-security -Wno-implicit-function-declaration -x c stdio.c.ut  && ./a.out
+*/
+
+//
+// actual module to test
+//
+#include "stdio.c"
+
+#undef printf
+
+#include <stdio.h>
+#include <string.h>
+
+static char bufio[2048];
+static int  bufsz;
+
+void terminal_write(const char* data, size_t size) {
+    for (int i=0; i<size ;++i)
+        bufio[bufsz++] = data[i];
+}
+
+
+int main(void) {
+    char ss[] = "ab";
+    
+    //
+    // _putchar() unit test
+    //
+    bufsz = 0;
+    _putchar(ss[0]);
+    _putchar(ss[1]);
+    printf("%s - _putchar()\n", (strncmp(bufio, ss, strlen(ss))==0) ?"OK" :"FAIL" );
+    
+    //
+    // _putchar() unit test
+    //
+    bufsz = 0;
+    _puts(ss);
+    char out[] = "ab\n";
+    printf("%s - _puts()\n", (strncmp(bufio, out, strlen(out))==0) ?"OK" :"FAIL" );
+    
+    //
+    // _printf() unit test
+    //
+    bufsz = 0;
+    _printf("[%s] %c [%s]", ss, '-', ss);
+    char out2[] = "[ab] - [ab]";
+    printf("%s - _printf()\n", (strncmp(bufio, out2, strlen(out2))==0) ?"OK" :"FAIL" );
+}
